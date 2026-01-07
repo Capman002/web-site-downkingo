@@ -12,15 +12,43 @@ import wailsIcon from '../assets/wails-icon.ico';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The ultimate privacy-focused media downloader and converter. Powered by Go & Wails. Support for YouTube, Instagram, TikTok. AI tools included.">
+    <title>DownKingo - Universal Media Toolbox (Downloader & Converter)</title>
+    
+    <meta name="description" content="The all-in-one open source media toolkit. Download videos/photos from 1000+ sites, remove backgrounds with AI, and convert media (MP4/MP3/JPG/PNG). Privacy-focused engine.">
+    <meta name="keywords" content="media toolbox, universal video downloader, instagram photo downloader, image converter, ai background remover, ffmpeg gui, youtube to mp3, open source tool">
     <meta name="theme-color" content="#050505">
-    <link rel="icon" type="image/x-icon" href="/icon.ico?v=2">
     
-    <title>DownKingo - Universal Media Toolbox</title>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://downkingo.com/">
+    <meta property="og:title" content="DownKingo - Universal Media Toolbox">
+    <meta property="og:description" content="The ultimate open-source toolkit. Download, convert, and process media with privacy. Powered by Go, Wails & FFmpeg.">
+    <meta property="og:image" content="https://downkingo.com/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://downkingo.com/">
+    <meta property="twitter:title" content="DownKingo - Universal Media Toolbox">
+    <meta property="twitter:description" content="The ultimate open-source toolkit. Download, convert, and process media with privacy. Powered by Go, Wails & FFmpeg.">
+    <meta property="twitter:image" content="https://downkingo.com/og-image.jpg">
     
-    <!-- JSON-LD SEO for FAQ -->
+    <!-- JSON-LD SEO for Software App + FAQ -->
     <script type="application/ld+json">
-      {
+      [
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "DownKingo",
+            "operatingSystem": "Windows, macOS, Linux",
+            "applicationCategory": "MultimediaApplication",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "description": "An open-source privacy-focused media downloader and converter toolkit."
+        },
+        {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": [
@@ -47,10 +75,28 @@ import wailsIcon from '../assets/wails-icon.ico';
               "@type": "Answer",
               "text": "Yes. By converting streaming content directly into static files (MP4/MKV/MP3), all platform advertisements are naturally stripped away, giving you a clean, ad-free offline playback experience."
             }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I download 4K videos from YouTube for free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. DownKingo supports downloading videos in their highest available quality, including 4K (2160p), 8K (4320p), and 60fps, without any paywalls or premium subscriptions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is this better than online YouTube to MP3 converters?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Much better. Online converters are often full of pop-up ads, slow, and compress your audio. DownKingo runs natively on your PC, providing faster speeds, batch downloading, and original audio quality extraction."
+            }
           }
         ]
       }
+      ]
     </script>
+    <link rel="icon" type="image/x-icon" href="/icon.ico?v=2">
     
     <!-- Preload Critical Assets -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -489,7 +535,7 @@ import wailsIcon from '../assets/wails-icon.ico';
                  <p class="text-muted text-sm font-mono uppercase">Everything you need. Nothing you don't.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Card 1 -->
                 <div class="group border border-white/10 bg-white/[0.02] p-8 rounded-2xl hover:bg-white/[0.04] transition-colors">
                     <div class="mb-6 opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all">
@@ -500,6 +546,18 @@ import wailsIcon from '../assets/wails-icon.ico';
                         Built-in FFmpeg wrapper to convert video, audio, and images between formats effortlessly.
                     </p>
                 </div>
+
+                 <!-- Card: AI Tools -->
+                 <div class="group border border-white/10 bg-white/[0.02] p-8 rounded-2xl hover:bg-white/[0.04] transition-colors">
+                    <div class="mb-6 opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all">
+                        <span class="iconify" data-icon="lucide:wand-2" data-width="32"></span>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 uppercase">AI Tools</h3>
+                    <p class="text-xs text-muted leading-relaxed font-mono">
+                        Remove image backgrounds automatically with AI (U2Net) and process Instagram carousels.
+                    </p>
+                </div>
+
                 <!-- Card 2 -->
                 <div class="group border border-white/10 bg-white/[0.02] p-8 rounded-2xl hover:bg-white/[0.04] transition-colors">
                     <div class="mb-6 opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all">
@@ -522,6 +580,55 @@ import wailsIcon from '../assets/wails-icon.ico';
                     </p>
                 </div>
             </div>
+        </section>
+
+        <!-- SUPPORTED FORMATS (SEO Section) -->
+        <section class="py-24 px-6 border-t border-white/5 bg-white/[0.01]">
+             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+                <!-- Text -->
+                <div class="space-y-6 reveal-wrapper">
+                    <h2 class="text-3xl font-black uppercase tracking-tighter text-white">Any Format.<br>Any Quality.</h2>
+                    <p class="text-muted text-sm leading-relaxed max-w-sm">
+                        Don't settle for compressed 720p. DownKingo extracts the raw stream, giving you pixel-perfect 4K and lossless audio.
+                    </p>
+                    <div class="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-widest text-primary/60">
+                        <span>#NoWatermark</span>
+                        <span>#4KDownload</span>
+                        <span>#YouTubeToMP3</span>
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 reveal-wrapper" style="transition-delay: 100ms;">
+                     <div class="p-6 border border-white/5 bg-black/40 rounded-xl hover:border-primary/30 transition-colors">
+                        <span class="block text-primary font-bold text-sm mb-2">Video</span>
+                        <ul class="text-xs text-muted font-mono space-y-1">
+                            <li>MP4 (H.264 / AV1)</li>
+                            <li>MKV (Matroska)</li>
+                            <li>WebM (VP9)</li>
+                            <li>MOV (ProRes)</li>
+                        </ul>
+                     </div>
+                     <div class="p-6 border border-white/5 bg-black/40 rounded-xl hover:border-primary/30 transition-colors">
+                        <span class="block text-primary font-bold text-sm mb-2">Audio</span>
+                        <ul class="text-xs text-muted font-mono space-y-1">
+                            <li>MP3 (320kbps)</li>
+                            <li>FLAC (Lossless)</li>
+                            <li>M4A (AAC)</li>
+                            <li>WAV (Uncompressed)</li>
+                        </ul>
+                     </div>
+                     <div class="p-6 border border-white/5 bg-black/40 rounded-xl hover:border-primary/30 transition-colors">
+                        <span class="block text-primary font-bold text-sm mb-2">Image & AI</span>
+                        <ul class="text-xs text-muted font-mono space-y-1">
+                            <li>JPG / PNG / WebP</li>
+                            <li>Instagram Carousels</li>
+                            <li>AI Background Remover</li>
+                            <li>Bulk Image Conversion</li>
+                        </ul>
+                     </div>
+                </div>
+             </div>
         </section>
 
         <!-- FAQ Section -->
@@ -553,6 +660,26 @@ import wailsIcon from '../assets/wails-icon.ico';
                    </summary>
                    <div class="px-6 pb-6 text-muted font-mono text-xs leading-relaxed border-t border-white/5 pt-4">
                        Absolutely. By converting the stream directly to a file (MP4/MP3), all platform ads are naturally stripped away. You get a clean file ready for offline enjoyment.
+                   </div>
+               </details>
+               
+               <details class="group bg-white/[0.02] border border-white/5 rounded-none open:bg-white/[0.04] transition-colors">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none font-bold text-white text-sm uppercase tracking-wide">
+                       Can I download 4K/8K videos?
+                       <span class="iconify group-open:rotate-180 transition-transform text-white/50" data-icon="lucide:chevron-down" data-width="16"></span>
+                   </summary>
+                   <div class="px-6 pb-6 text-muted font-mono text-xs leading-relaxed border-t border-white/5 pt-4">
+                       Yes. Unlike many online tools that limit you to 1080p, DownKingo accesses the premium streams directly, allowing you to download in <strong>4K (2160p)</strong> and even <strong>8K (4320p)</strong> if the source video supports it.
+                   </div>
+               </details>
+
+               <details class="group bg-white/[0.02] border border-white/5 rounded-none open:bg-white/[0.04] transition-colors">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none font-bold text-white text-sm uppercase tracking-wide">
+                       Why use this instead of Online Converters?
+                       <span class="iconify group-open:rotate-180 transition-transform text-white/50" data-icon="lucide:chevron-down" data-width="16"></span>
+                   </summary>
+                   <div class="px-6 pb-6 text-muted font-mono text-xs leading-relaxed border-t border-white/5 pt-4">
+                       Online converters are often dangerous, full of pop-ups, slow, and compress audio quality. DownKingo runs <strong>natively on your device</strong>, offering maximum download speeds, bulk downloading, and malware-free safety.
                    </div>
                </details>
             </div>
