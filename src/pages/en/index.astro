@@ -1,0 +1,837 @@
+---
+import '../../styles/global.css';
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import { SEO } from 'astro-seo';
+import temaClaro from '../../assets/tema-claro-com-sidebar.avif';
+import buildInPublic from '../../assets/build-in-public-kingo.avif';
+import issues from '../../assets/issues.avif';
+import kingoIcon from '../../assets/kingo.ico';
+import wailsIcon from '../../assets/wails-icon.ico';
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth selection:bg-primary/30 selection:text-white">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <SEO
+      title="DownKingo - Universal Media Toolbox (Downloader & Converter)"
+      description="The all-in-one open source media toolkit. Download videos/photos from 1000+ sites, remove backgrounds with AI, and convert media (MP4/MP3/JPG/PNG). Privacy-focused engine."
+      canonical="https://downkingo.com/"
+      openGraph={{
+        basic: {
+          title: "DownKingo - Universal Media Toolbox",
+          type: "website",
+          image: "https://downkingo.com/og-image.png",
+          url: "https://downkingo.com/"
+        },
+        optional: {
+          description: "The ultimate open-source toolkit. Download, convert, and process media with privacy. Powered by Go, Wails & FFmpeg."
+        }
+      }}
+      twitter={{
+        card: "summary_large_image",
+        title: "DownKingo - Universal Media Toolbox",
+        description: "The ultimate open-source toolkit. Download, convert, and process media with privacy. Powered by Go, Wails & FFmpeg.",
+        image: "https://downkingo.com/og-image.png"
+      }}
+      extend={{
+        meta: [
+          { name: "keywords", content: "media toolbox, universal video downloader, instagram photo downloader, image converter, ai background remover, ffmpeg gui, youtube to mp3, open source tool" },
+          { name: "theme-color", content: "#050505" }
+        ],
+        link: [
+          { rel: "icon", type: "image/x-icon", href: "/icon.ico?v=2" }
+        ]
+      }}
+    />
+    
+    <!-- JSON-LD SEO for Software App + FAQ -->
+    <script type="application/ld+json">
+      [
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "DownKingo",
+            "operatingSystem": "Windows, macOS, Linux",
+            "applicationCategory": "MultimediaApplication",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "description": "An open-source privacy-focused media downloader and converter toolkit."
+        },
+        {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What engine does DownKingo use for downloading media?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "DownKingo leverages the industry-standard yt-dlp engine combined with FFmpeg for processing. This ensures support for high-quality downloads (up to 4K) from YouTube, TikTok, Instagram, and over 1000 other websites."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is DownKingo safe and truly private?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. DownKingo is 100% Open Source and engineered with privacy by design. All video processing happens locally on your device. We do not collect telemetry, track usage, or have any servers to store your data."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does DownKingo remove ads from videos?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. By converting streaming content directly into static files (MP4/MKV/MP3), all platform advertisements are naturally stripped away, giving you a clean, ad-free offline playback experience."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I download 4K videos from YouTube for free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. DownKingo supports downloading videos in their highest available quality, including 4K (2160p), 8K (4320p), and 60fps, without any paywalls or premium subscriptions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is this better than online YouTube to MP3 converters?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Much better. Online converters are often full of pop-up ads, slow, and compress your audio. DownKingo runs natively on your PC, providing faster speeds, batch downloading, and original audio quality extraction."
+            }
+          }
+        ]
+      }
+      ]
+    </script>
+    
+    <!-- Preload Critical Assets -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script type="text/partytown" defer data-domain="downkingo.com" src="https://plausible.io/js/script.js"></script>
+    
+    <!-- Language Auto-Redirect -->
+    <script is:inline>
+        (function() {
+            try {
+                // Only redirect once per session to allow manual override
+                var redirectKey = 'downkingo_redirected';
+                if (!sessionStorage.getItem(redirectKey)) {
+                    var lang = navigator.language || navigator.userLanguage;
+                    // Check if language starts with 'pt' (pt-BR, pt-PT)
+                    if (lang && lang.toLowerCase().indexOf('pt') === 0) {
+                        sessionStorage.setItem(redirectKey, 'true');
+                        window.location.href = '/pt/';
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
+</head>
+<body class="bg-page text-swiss antialiased overflow-x-hidden relative" id="body">
+
+    <!-- Noise Texture -->
+    <div class="fixed inset-0 pointer-events-none z-[60] opacity-[0.03] mix-blend-overlay" style="background-image: url('https://grainy-gradients.vercel.app/noise.svg');"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm md:max-w-2xl px-4" x-data="{ open: false }">
+        <div class="glass rounded-full px-6 py-3 flex items-center justify-between border border-white/5 bg-[#050505]/90 backdrop-blur-xl">
+            <a href="/en/" class="font-black text-lg tracking-tighter uppercase flex items-center gap-2 group">
+                <Image src={kingoIcon} alt="DownKingo Logo" width={20} height={20} class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                <span class="text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#F24E1E] group-hover:via-[#FFC700] group-hover:to-[#1ABCFE] transition-all duration-300">DownKingo</span>
+            </a>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex gap-8 font-mono text-xs font-medium text-white/70">
+                <a href="/en/" class="hover:text-white transition-colors">HOME</a>
+                <a href="/en/download" class="hover:text-white transition-colors">DOWNLOAD</a>
+                <a href="#build-in-public" class="hover:text-white transition-colors">ROADMAP</a>
+                <a href="https://github.com/down-kingo/downkingo" target="_blank" class="flex items-center gap-1 hover:text-white transition-colors">
+                    GITHUB <Icon name="lucide:external-link" width={12} />
+                </a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-white p-1 hover:bg-white/10 rounded-full transition-colors" aria-label="Menu">
+                <Icon name="lucide:menu" width={20} />
+            </button>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="absolute top-[120%] left-4 right-4 bg-black/90 glass border border-white/10 rounded-2xl p-6 flex-col gap-4 hidden origin-top scale-95 opacity-0 transition-all duration-300">
+             <a href="/en/" class="text-sm font-bold text-white py-2 border-b border-white/5 hover:text-primary transition-colors">HOME</a>
+             <a href="/en/download" class="text-sm font-bold text-white py-2 border-b border-white/5 hover:text-primary transition-colors">DOWNLOAD</a>
+             <a href="#build-in-public" class="text-sm font-bold text-white py-2 border-b border-white/5 hover:text-primary transition-colors">ROADMAP</a>
+             <a href="https://github.com/down-kingo/downkingo" target="_blank" class="text-sm font-bold text-white py-2 flex items-center justify-between hover:text-primary transition-colors">
+                GITHUB <Icon name="lucide:external-link" width={14} />
+             </a>
+        </div>
+    </nav>
+
+    <script is:inline>
+        document.addEventListener('DOMContentLoaded', () => {
+             const btn = document.getElementById('mobile-menu-btn');
+             const menu = document.getElementById('mobile-menu');
+             let isOpen = false;
+
+             const iconMenu = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>`;
+             const iconX = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 18 18"/></svg>`;
+
+             btn.addEventListener('click', () => {
+                 isOpen = !isOpen;
+                 if (isOpen) {
+                     menu.classList.remove('hidden', 'scale-95', 'opacity-0');
+                     menu.classList.add('flex', 'scale-100', 'opacity-100');
+                     btn.innerHTML = iconX;
+                 } else {
+                     menu.classList.add('hidden', 'scale-95', 'opacity-0');
+                     menu.classList.remove('flex', 'scale-100', 'opacity-100');
+                     btn.innerHTML = iconMenu;
+                 }
+             });
+
+             // Close on link click
+             menu.querySelectorAll('a').forEach(link => {
+                 link.addEventListener('click', () => {
+                     isOpen = false;
+                     menu.classList.add('hidden', 'scale-95', 'opacity-0');
+                     menu.classList.remove('flex', 'scale-100', 'opacity-100');
+                     btn.innerHTML = iconMenu;
+                 });
+             });
+        });
+    </script>
+
+    <!-- Main Content -->
+    <main class="relative z-10 w-full overflow-hidden">
+        
+        <!-- Hero Section -->
+        <section class="relative min-h-[90vh] flex flex-col items-center justify-center pt-24 px-6 overflow-hidden">
+            <!-- Background Elements -->
+            <div class="absolute inset-0 bg-grid-premium opacity-20 pointer-events-none"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 blur-[120px] rounded-full opacity-20 pointer-events-none mix-blend-screen animate-pulse duration-[5000ms]"></div>
+            
+            <div class="relative z-10 text-center max-w-5xl mx-auto space-y-10">
+                <!-- Status Badge -->
+                <div class="inline-flex items-center gap-3 border border-white/5 rounded-full pl-2 pr-4 py-1 bg-black/40 backdrop-blur-md hover:border-white/10 transition-colors">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="font-mono text-[10px] tracking-widest text-muted uppercase">System v2.0 Online</span>
+                </div>
+
+                <!-- Main Title -->
+                <h1 class="font-black text-6xl md:text-9xl tracking-tighter uppercase leading-[0.85] select-none text-white drop-shadow-2xl">
+                    Media <br><span class="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">Toolbox.</span>
+                </h1>
+                
+                <!-- Actions -->
+                <div class="flex flex-col md:flex-row items-center justify-center gap-6 pt-8">
+                     <a id="hero-download-btn" href="/en/download" class="h-14 px-10 bg-white text-black font-black text-sm uppercase tracking-widest hover:bg-gray-200 transition-all rounded-full flex items-center gap-3 hover:scale-105 active:scale-95">
+                             <span id="hero-download-text">Download v2.0</span>
+                             <Icon id="hero-download-icon" name="lucide:arrow-down" width={20} />
+                     </a>
+                     <a href="/intro" class="h-14 px-10 border border-white/20 hover:border-white text-white font-mono text-xs uppercase tracking-widest rounded-full flex items-center gap-3 transition-all hover:bg-white/5 hover:scale-105 active:scale-95">
+                        <Icon name="lucide:book-open" width={20} />
+                        <span>Documentation</span>
+                     </a>
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- Marquee / Supported Sites -->
+        <section class="py-10 border-y border-white/5 bg-black/50 overflow-hidden">
+             <div class="relative w-full overflow-hidden text-center">
+                 <p class="text-[10px] font-mono uppercase tracking-widest text-muted mb-6">Supported Platforms</p>
+                 <div class="flex whitespace-nowrap animate-marquee opacity-60 hover:opacity-100 transition-opacity">
+                     <!-- Set 1 -->
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:youtube" /> YouTube</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:tiktok" /> TikTok</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:instagram" /> Instagram</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:x" /> Twitter / X</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:soundcloud" /> Soundcloud</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:twitch" /> Twitch</span>
+                     
+                     <!-- GLOBO -->
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm6-3c0 2.37-1.4 4.42-3.46 5.28-.5.21-1.03.38-1.57.49l-.02.01c-.13.03-.27.05-.41.07l-.1.01c-.14.02-.29.04-.44.04-.15 0-.29-.02-.44-.04l-.1-.01c-.14-.02-.28-.04-.41-.07l-.02-.01c-.54-.11-1.07-.28-1.57-.49C7.4 16.42 6 14.37 6 12s1.4-4.42 3.46-5.28c.5-.21 1.03-.38 1.57-.49l.02-.01c.14-.03.28-.05.41-.07l.1-.01c.15-.02.29-.04.44-.04.15 0 .29.02.44.04l.1.01c.14.02.28.04.41.07l.02.01c.54.11 1.07.28 1.57.49C16.6 7.58 18 9.63 18 12z" clip-rule="evenodd"/></svg>
+                        Globo
+                     </span>
+
+                     <!-- ESPN (Font Simulation: Impact Italic) -->
+                     <span class="mx-12 text-lg text-white cursor-default flex items-center gap-2" style="font-family: Impact, sans-serif; font-style: italic; letter-spacing: 1px;">
+                        ESPN
+                     </span>
+                     
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:pinterest" /> Pinterest</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:reddit" /> Reddit</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:facebook" /> Facebook</span>
+
+                     <!-- Set 2 (Duplicate for Loop) -->
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:youtube" /> YouTube</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:tiktok" /> TikTok</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:instagram" /> Instagram</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:x" /> Twitter / X</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:soundcloud" /> Soundcloud</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><Icon name="simple-icons:twitch" /> Twitch</span>
+                     
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm6-3c0 2.37-1.4 4.42-3.46 5.28-.5.21-1.03.38-1.57.49l-.02.01c-.13.03-.27.05-.41.07l-.1.01c-.14.02-.29.04-.44.04-.15 0-.29-.02-.44-.04l-.1-.01c-.14-.02-.28-.04-.41-.07l-.02-.01c-.54-.11-1.07-.28-1.57-.49C7.4 16.42 6 14.37 6 12s1.4-4.42 3.46-5.28c.5-.21 1.03-.38 1.57-.49l.02-.01c.14-.03.28-.05.41-.07l.1-.01c.15-.02.29-.04.44-.04.15 0 .29.02.44.04l.1.01c.14.02.28.04.41.07l.02.01c.54.11 1.07.28 1.57.49C16.6 7.58 18 9.63 18 12z" clip-rule="evenodd"/></svg>
+                        Globo
+                     </span>
+
+                     <!-- ESPN (Font Simulation: Impact Italic) -->
+                     <span class="mx-12 text-lg text-white cursor-default flex items-center gap-2" style="font-family: Impact, sans-serif; font-style: italic; letter-spacing: 1px;">
+                        ESPN
+                     </span>
+                     
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><span class="iconify" data-icon="simple-icons:pinterest"></span> Pinterest</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><span class="iconify" data-icon="simple-icons:reddit"></span> Reddit</span>
+                     <span class="mx-12 text-sm font-bold uppercase text-white cursor-default flex items-center gap-2"><span class="iconify" data-icon="simple-icons:facebook"></span> Facebook</span>
+                 </div>
+             </div>
+        </section>
+
+        <!-- DATA / FEATURES Section -->
+        <section id="features" class="py-32 px-6 max-w-7xl mx-auto border-b border-white/5">
+            <div class="space-y-32">
+                
+                <!-- FEATURE BLOCK 1: Architecture + Screen -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    
+                    <!-- Text Content -->
+                    <div class="space-y-8 reveal-wrapper">
+                        <span class="inline-block mb-4 font-mono text-xs text-primary uppercase tracking-widest border border-primary/20 bg-primary/5 px-2 py-1 rounded">Architecture</span>
+                        <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white">Engineered<br>in Go.</h2>
+                        
+                        <ul class="space-y-6 pt-4">
+                            <li class="flex items-start gap-4 group">
+                                <div class="p-2 rounded-lg bg-white/5 group-hover:bg-primary/10 transition-colors">
+                                    <Image src={wailsIcon} alt="Wails" width={48} height={48} class="w-5 h-5 object-contain" />
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm uppercase">Wails Framework</h4>
+                                    <p class="text-xs text-muted mt-1 leading-relaxed">The lightweight power of Go for the backend, bridging native system webviews.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-4 group">
+                                <div class="p-2 rounded-lg bg-white/5 group-hover:bg-primary/10 transition-colors">
+                                    <Icon name="simple-icons:react" class="text-primary" width={20} />
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm uppercase">React 19</h4>
+                                    <p class="text-xs text-muted mt-1 leading-relaxed">Powered by the latest React features for instant interactions and a fluid UI.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Visual Content: App Screenshot -->
+                    <div class="relative group reveal-wrapper perspective-container">
+                        <!-- Glow Effect -->
+                        <div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                        
+                        <!-- Image Container -->
+                        <div class="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-[#050505] rotate-3d hover:transition-transform duration-500">
+                             <!-- Mac/Window Controls Decoration -->
+                             <div class="h-8 bg-[#111] border-b border-white/5 flex items-center px-4 gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center text-[8px] opacity-50"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500/20 text-yellow-500 opacity-50"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500/20 text-green-500 opacity-50"></div>
+                                <div class="ml-auto text-[10px] font-mono text-muted/50">downkingo-v2</div>
+                             </div>
+                             
+                             <Image src={temaClaro} alt="DownKingo Dark Mode Interface" class="w-full h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+                             
+                             <!-- Overlay Gradient -->
+                             <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-20 pointer-events-none"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FEATURE BLOCK 2: Terminal + Capabilities -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    
+                    <!-- Visual Content: Terminal (Left) -->
+                    <div class="relative w-full perspective-container order-2 lg:order-1">
+                        <!-- Terminal Window -->
+                        <div class="bg-[#09090b] border border-white/10 rounded-lg overflow-hidden shadow-2xl reveal-wrapper rotate-3d-reverse font-mono text-[10px] md:text-xs leading-relaxed select-none group">
+                            
+                            <!-- Terminal Header -->
+                            <div class="flex items-center justify-between px-4 py-2 bg-[#111113] border-b border-white/5 transition-colors group-hover:bg-[#1a1a1c]">
+                                <div class="flex items-center gap-2 text-muted">
+                                    <Icon name="lucide:terminal-square" width={14} />
+                                    <span class="uppercase tracking-widest text-[10px] font-bold">Console</span>
+                                </div>
+                                <div class="flex gap-2 opacity-50">
+                                    <Icon name="lucide:lock" width={12} />
+                                    <Icon name="lucide:maximize" width={12} />
+                                    <Icon name="lucide:chevron-down" width={12} />
+                                </div>
+                            </div>
+
+                            <!-- Terminal Content -->
+                            <div class="p-4 space-y-3 h-[400px] overflow-hidden relative">
+                                <!-- Background Grid Effect inside terminal -->
+                                <div class="absolute inset-0 bg-grid-premium opacity-5 pointer-events-none"></div>
+
+                                <!-- Lines -->
+                                <div class="flex gap-3 text-cyan-500/80 animate-fade-in-up" style="animation-delay: 100ms;">
+                                    <Icon name="lucide:info" class="mt-0.5" width={12} />
+                                    <span>Fetching information...</span>
+                                    <span class="ml-auto opacity-30">00:04:34</span>
+                                </div>
+
+                                <div class="flex gap-3 text-emerald-500 bg-emerald-500/5 py-1 -mx-2 px-2 rounded animate-fade-in-up" style="animation-delay: 200ms;">
+                                    <Icon name="lucide:check" class="mt-0.5" width={12} />
+                                    <span>"you need to learn FFmpeg RIGHT NOW!!" found</span>
+                                    <span class="ml-auto opacity-30">00:04:43</span>
+                                </div>
+
+                                <div class="flex gap-3 text-muted animate-fade-in-up" style="animation-delay: 300ms;">
+                                    <Icon name="lucide:info" class="mt-0.5" width={12} />
+                                    <span class="truncate">Extracting URL: https://www.youtube.com/watch?v=...</span>
+                                    <span class="ml-auto opacity-30">00:05:00</span>
+                                </div>
+
+                                <div class="flex gap-3 text-muted animate-fade-in-up" style="animation-delay: 400ms;">
+                                    <Icon name="lucide:info" class="mt-0.5" width={12} />
+                                    <span>Downloading 1 format(s): 137+140-9</span>
+                                    <span class="ml-auto opacity-30">00:05:03</span>
+                                </div>
+
+                                <!-- Progress Bar 1 -->
+                                <div class="space-y-1 pt-2 animate-fade-in-up" style="animation-delay: 600ms;">
+                                    <div class="flex gap-3 text-cyan-400">
+                                        <Icon name="lucide:loader-2" class="mt-0.5" width={12} />
+                                        <span>Downloading video...</span>
+                                        <span class="ml-auto text-cyan-400">99%</span>
+                                        <span class="text-cyan-400/50">5.7MiB</span>
+                                    </div>
+                                    <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-cyan-500 w-[99%] shadow-[0_0_10px_rgba(6,182,212,0.5)]"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Progress Bar 2 -->
+                                <div class="space-y-1 pt-2 animate-fade-in-up" style="animation-delay: 800ms;">
+                                    <div class="flex gap-3 text-cyan-400">
+                                        <Icon name="lucide:loader-2" class="mt-0.5" width={12} />
+                                        <span>Downloading audio...</span>
+                                        <span class="ml-auto text-cyan-400">93%</span>
+                                        <span class="text-cyan-400/50">751KiB</span>
+                                    </div>
+                                    <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-cyan-500 w-[93%] shadow-[0_0_10px_rgba(6,182,212,0.5)]"></div>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-3 text-purple-400 pt-2 animate-fade-in-up" style="animation-delay: 1000ms;">
+                                    <Icon name="lucide:merge" class="mt-0.5" width={12} />
+                                    <span>Merging Audio and Video...</span>
+                                    <span class="ml-auto opacity-30">00:05:30</span>
+                                </div>
+
+                                <div class="flex gap-3 text-amber-500 animate-fade-in-up" style="animation-delay: 1200ms;">
+                                    <Icon name="lucide:alert-triangle" class="mt-0.5" width={12} />
+                                    <span>Cleaning temp files...</span>
+                                    <span class="ml-auto opacity-30">00:05:31</span>
+                                </div>
+
+                                <div class="flex gap-3 text-muted/50 animate-fade-in-up" style="animation-delay: 1400ms;">
+                                    <Icon name="lucide:file-video" class="mt-0.5" width={12} />
+                                    <span class="truncate">[VideoRemuxer] Not remuxing media file... already is in target format mp4</span>
+                                </div>
+                                
+                                <div class="flex gap-3 text-rose-400 animate-fade-in-up" style="animation-delay: 1600ms;">
+                                    <Icon name="lucide:image" class="mt-0.5" width={12} />
+                                    <span>Processing thumbnail...</span>
+                                </div>
+                                
+                                <!-- Success State -->
+                                <div class="flex flex-col gap-2 animate-fade-in-up" style="animation-delay: 1800ms;">
+                                    <div class="flex gap-3 text-emerald-400 font-bold">
+                                        <Icon name="lucide:check-circle-2" class="mt-0.5" width={12} />
+                                        <span>Download Completed!</span>
+                                        <span class="ml-auto opacity-50 font-normal">00:05:35</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Text Content -->
+                    <div class="space-y-8 reveal-wrapper order-1 lg:order-2">
+                        <span class="inline-block mb-4 font-mono text-xs text-indigo-400 uppercase tracking-widest border border-indigo-500/20 bg-indigo-500/5 px-2 py-1 rounded">Capabilities</span>
+                        <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white">Universal<br>Downloader.</h2>
+                        <p class="text-muted max-w-md text-sm leading-relaxed">
+                            Powered by the battle-tested <code>yt-dlp</code> engine, with custom wrappers for social platforms.
+                        </p>
+                         <ul class="space-y-6 pt-4">
+                            <li class="flex items-start gap-4 group">
+                                <div class="p-2 rounded-lg bg-white/5 group-hover:bg-indigo-500/10 transition-colors">
+                                    <Icon name="lucide:layers" class="text-indigo-400" width={20} />
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm uppercase">Multi-Format</h4>
+                                    <p class="text-xs text-muted mt-1 leading-relaxed">Video (MP4, MKV, WebM) & Audio (MP3, FLAC, WAV) with automatic FFmpeg muxing.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-4 group">
+                                <div class="p-2 rounded-lg bg-white/5 group-hover:bg-indigo-500/10 transition-colors">
+                                    <Icon name="lucide:terminal" class="text-indigo-400" width={20} />
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm uppercase">yt-dlp Engine</h4>
+                                    <p class="text-xs text-muted mt-1 leading-relaxed">Direct integration with the industry standard for media extraction. Supports 1000+ websites.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BUILD IN PUBLIC SECTION -->
+        <section id="build-in-public" class="py-32 px-6 border-b border-white/5 overflow-hidden relative">
+            <!-- Background Noise/Glow -->
+            <div class="absolute top-0 right-0 w-1/2 h-full bg-primary/5 blur-3xl rounded-full opacity-20 pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- Text Side -->
+                <div class="space-y-8 reveal-wrapper z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-green-500/20 bg-green-500/5 text-green-400 font-mono text-xs uppercase tracking-widest">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        Live Development
+                    </div>
+                    <h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white leading-[0.9]">
+                        Build In <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">Public.</span>
+                    </h2>
+                    <p class="text-muted text-lg leading-relaxed max-w-md">
+                        No secrets. No hidden tracking. Just pure open source code.
+                        View our live roadmap, vote on features, and check our progress in real-time right from the app.
+                    </p>
+                    
+                    <!-- Stats / GitHub Integration -->
+                    <div class="flex items-center gap-8 pt-4">
+                        <div class="flex items-center gap-4">
+                            <Icon name="simple-icons:opensourceinitiative" class="text-white" width={40} />
+                            <div class="space-y-0.5">
+                                <span class="text-2xl font-black text-white block leading-none">100%</span>
+                                <p class="text-xs font-mono uppercase text-muted leading-none">Open Source</p>
+                            </div>
+                        </div>
+                        <div class="w-px h-10 bg-white/10"></div>
+                        <a href="https://github.com/orgs/down-kingo/projects/2" target="_blank" class="flex items-center gap-4 group/roadmap cursor-pointer hover:bg-white/5 p-2 -m-2 rounded-lg transition-all">
+                            <Icon name="simple-icons:github" class="text-white group-hover/roadmap:scale-110 transition-transform duration-300" width={40} />
+                            <div class="space-y-0.5">
+                                <span class="text-2xl font-black text-white block leading-none">GitHub</span>
+                                <p class="text-xs font-mono uppercase text-muted leading-none flex items-center gap-1 group-hover/roadmap:text-white transition-colors">
+                                    Kanban Board
+                                    <Icon name="lucide:arrow-right" class="opacity-0 -translate-x-2 group-hover/roadmap:opacity-100 group-hover/roadmap:translate-x-0 transition-all duration-300" width={12} />
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Visual Side (Creative Composition) -->
+                <div class="relative reveal-wrapper lg:translate-x-12 perspective-container">
+                    <!-- Main Image (Roadmap) -->
+                    <div class="relative z-10 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-[#09090b] lg:rotate-2 hover:rotate-0 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
+                        <Image src={buildInPublic} alt="Roadmap Interface" class="w-full h-auto opacity-90 hover:opacity-100 transition-opacity" />
+                    </div>
+                    
+                    <!-- Floating Secondary Image (Issues) -->
+                    <div class="absolute -bottom-12 -left-12 z-20 w-2/3 rounded-xl overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 bg-[#09090b] -rotate-3 hover:rotate-0 transition-transform duration-700 delay-100 hidden md:block">
+                        <Image src={issues} alt="GitHub Issues Integration" class="w-full h-auto opacity-90 hover:opacity-100 transition-opacity" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRID FEATURES -->
+        <section id="toolkit" class="py-32 px-6 max-w-7xl mx-auto">
+            <div class="text-center mb-20 reveal-wrapper">
+                 <h2 class="text-4xl font-black uppercase tracking-tighter text-white mb-4">The Toolkit.</h2>
+                 <p class="text-muted text-sm font-mono uppercase">Everything you need. Nothing you don't.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="group border border-white/10 bg-white/[0.02] p-8 rounded-2xl hover:bg-white/[0.04] transition-colors">
+                    <div class="mb-6 opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all">
+                        <Icon name="lucide:refresh-cw" width={32} />
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 uppercase">Smart Converter</h3>
+                    <p class="text-xs text-muted leading-relaxed font-mono">
+                        Built-in FFmpeg wrapper to convert video, audio, and images between formats effortlessly.
+                    </p>
+                </div>
+
+                 <!-- Card: AI Tools -->
+                 <div class="group border border-white/10 bg-white/[0.02] p-8 rounded-2xl hover:bg-white/[0.04] transition-colors">
+                    <div class="mb-6 opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all">
+                        <Icon name="lucide:wand-2" width={32} />
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 uppercase">AI Tools</h3>
+                    <p class="text-xs text-muted leading-relaxed font-mono">
+                        Remove image backgrounds automatically with AI (U2Net) and process Instagram carousels.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="group border border-white/10 bg-white/[0.02] p-8 rounded-2xl hover:bg-white/[0.04] transition-colors">
+                    <div class="mb-6 opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all">
+                        <Icon name="lucide:shield-check" width={32} />
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 uppercase">Zero Telemetry</h3>
+                    <p class="text-xs text-muted leading-relaxed font-mono">
+                         Privacy by design. No tracking servers. Your usage data never leaves your device.
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="group border border-white/10 bg-white/[0.02] p-8 rounded-2xl hover:bg-white/[0.04] transition-colors">
+                    <div class="mb-6 opacity-50 group-hover:opacity-100 group-hover:text-primary transition-all">
+                        <Icon name="lucide:globe" width={32} />
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 uppercase">Polyglot</h3>
+                    <p class="text-xs text-muted leading-relaxed font-mono">
+                        Localized in 5 languages: English, Portuguese, Spanish, French, and German.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUPPORTED FORMATS (SEO Section) -->
+        <section class="py-24 px-6 border-t border-white/5 bg-white/[0.01]">
+             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+                <!-- Text -->
+                <div class="space-y-6 reveal-wrapper">
+                    <h2 class="text-3xl font-black uppercase tracking-tighter text-white">Any Format.<br>Any Quality.</h2>
+                    <p class="text-muted text-sm leading-relaxed max-w-sm">
+                        Don't settle for compressed 720p. DownKingo extracts the raw stream, giving you pixel-perfect 4K and lossless audio.
+                    </p>
+                    <div class="flex flex-wrap gap-2 text-[10px] font-mono uppercase tracking-widest text-primary/60">
+                        <span>#NoWatermark</span>
+                        <span>#4KDownload</span>
+                        <span>#YouTubeToMP3</span>
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 reveal-wrapper" style="transition-delay: 100ms;">
+                     <div class="p-6 border border-white/5 bg-black/40 rounded-xl hover:border-primary/30 transition-colors">
+                        <span class="block text-primary font-bold text-sm mb-2">Video</span>
+                        <ul class="text-xs text-muted font-mono space-y-1">
+                            <li>MP4 (H.264 / AV1)</li>
+                            <li>MKV (Matroska)</li>
+                            <li>WebM (VP9)</li>
+                            <li>MOV (ProRes)</li>
+                        </ul>
+                     </div>
+                     <div class="p-6 border border-white/5 bg-black/40 rounded-xl hover:border-primary/30 transition-colors">
+                        <span class="block text-primary font-bold text-sm mb-2">Audio</span>
+                        <ul class="text-xs text-muted font-mono space-y-1">
+                            <li>MP3 (320kbps)</li>
+                            <li>FLAC (Lossless)</li>
+                            <li>M4A (AAC)</li>
+                            <li>WAV (Uncompressed)</li>
+                        </ul>
+                     </div>
+                     <div class="p-6 border border-white/5 bg-black/40 rounded-xl hover:border-primary/30 transition-colors">
+                        <span class="block text-primary font-bold text-sm mb-2">Image & AI</span>
+                        <ul class="text-xs text-muted font-mono space-y-1">
+                            <li>JPG / PNG / WebP</li>
+                            <li>Instagram Carousels</li>
+                            <li>AI Background Remover</li>
+                            <li>Bulk Image Conversion</li>
+                        </ul>
+                     </div>
+                </div>
+             </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-24 px-6 max-w-4xl mx-auto border-t border-white/5">
+            <h2 class="text-2xl font-black uppercase text-white mb-12 text-center tracking-widest">Protocol Q&A</h2>
+            <div class="space-y-4">
+                <details class="group bg-white/[0.02] border border-white/5 rounded-none open:bg-white/[0.04] transition-colors">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none font-bold text-white text-sm uppercase tracking-wide">
+                        What engine does DownKingo use?
+                        <Icon name="lucide:chevron-down" class="group-open:rotate-180 transition-transform text-white/50" width={16} />
+                    </summary>
+                    <div class="px-6 pb-6 text-muted font-mono text-xs leading-relaxed border-t border-white/5 pt-4">
+                        DownKingo wraps the industry-standard <code>yt-dlp</code> binary for extraction, piped through <code>FFmpeg</code> for processing. This ensures day-one compatibility with thousands of sites including YouTube, TikTok, and Instagram.
+                    </div>
+                </details>
+                <details class="group bg-white/[0.02] border border-white/5 rounded-none open:bg-white/[0.04] transition-colors">
+                     <summary class="flex items-center justify-between p-6 cursor-pointer list-none font-bold text-white text-sm uppercase tracking-wide">
+                        Is DownKingo truly private?
+                        <Icon name="lucide:chevron-down" class="group-open:rotate-180 transition-transform text-white/50" width={16} />
+                    </summary>
+                    <div class="px-6 pb-6 text-muted font-mono text-xs leading-relaxed border-t border-white/5 pt-4">
+                        Yes. The code is <strong>Open Source</strong>. All processing happens locally on your machine. No URLs are sent to our servers (we don't even have servers for tracking). The only network requests are to standard update APIs (GitHub Releases).
+                    </div>
+                </details>
+                 <details class="group bg-white/[0.02] border border-white/5 rounded-none open:bg-white/[0.04] transition-colors">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none font-bold text-white text-sm uppercase tracking-wide">
+                       Does it remove ads from downloads?
+                       <span class="iconify group-open:rotate-180 transition-transform text-white/50" data-icon="lucide:chevron-down" data-width="16"></span>
+                   </summary>
+                   <div class="px-6 pb-6 text-muted font-mono text-xs leading-relaxed border-t border-white/5 pt-4">
+                       Absolutely. By converting the stream directly to a file (MP4/MP3), all platform ads are naturally stripped away. You get a clean file ready for offline enjoyment.
+                   </div>
+               </details>
+               
+               <details class="group bg-white/[0.02] border border-white/5 rounded-none open:bg-white/[0.04] transition-colors">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none font-bold text-white text-sm uppercase tracking-wide">
+                       Can I download 4K/8K videos?
+                       <span class="iconify group-open:rotate-180 transition-transform text-white/50" data-icon="lucide:chevron-down" data-width="16"></span>
+                   </summary>
+                   <div class="px-6 pb-6 text-muted font-mono text-xs leading-relaxed border-t border-white/5 pt-4">
+                       Yes. Unlike many online tools that limit you to 1080p, DownKingo accesses the premium streams directly, allowing you to download in <strong>4K (2160p)</strong> and even <strong>8K (4320p)</strong> if the source video supports it.
+                   </div>
+               </details>
+
+               <details class="group bg-white/[0.02] border border-white/5 rounded-none open:bg-white/[0.04] transition-colors">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer list-none font-bold text-white text-sm uppercase tracking-wide">
+                       Why use this instead of Online Converters?
+                       <span class="iconify group-open:rotate-180 transition-transform text-white/50" data-icon="lucide:chevron-down" data-width="16"></span>
+                   </summary>
+                   <div class="px-6 pb-6 text-muted font-mono text-xs leading-relaxed border-t border-white/5 pt-4">
+                       Online converters are often dangerous, full of pop-ups, slow, and compress audio quality. DownKingo runs <strong>natively on your device</strong>, offering maximum download speeds, bulk downloading, and malware-free safety.
+                   </div>
+               </details>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="relative py-12 px-6 border-t border-white/5 bg-black overflow-hidden">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 relative z-10">
+                
+                <!-- Brand & Socials (Left) -->
+                <div class="space-y-6 md:max-w-xs">
+                    <div>
+                        <a href="/en/" class="group inline-flex items-center gap-2">
+                            <span class="font-black text-2xl tracking-tighter uppercase text-gradient-kingo">DownKingo<span class="text-white">.</span></span>
+                        </a>
+                        <p class="mt-2 text-xs text-muted font-mono leading-relaxed">
+                            The ultimate open-source media toolkit.<br>
+                            Powered by Wails v2 + React.
+                        </p>
+                    </div>
+                    
+                    <!-- Socials (Left Aligned) -->
+                    <div class="flex gap-4">
+                        <a href="https://github.com/down-kingo/downkingo" target="_blank" class="p-2 -ml-2 rounded-lg hover:bg-white/5 text-muted hover:text-white transition-colors" aria-label="GitHub">
+                            <Icon name="simple-icons:github" width={20} />
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navigation Grid (Right - Compact 2 cols) -->
+                <div class="grid grid-cols-2 gap-x-12 gap-y-4 text-sm">
+                    <div class="flex flex-col gap-3">
+                        <span class="font-mono text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Product</span>
+                        <a href="/en/download" class="text-muted hover:text-primary transition-colors">Download</a>
+                        <a href="#features" class="text-muted hover:text-primary transition-colors">Features</a>
+                        <a href="#build-in-public" class="text-muted hover:text-primary transition-colors">Roadmap</a>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <span class="font-mono text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Resources</span>
+                        <a href="/intro" class="text-muted hover:text-primary transition-colors">Docs</a>
+                        <a href="#faq" class="text-muted hover:text-primary transition-colors">Q&A</a>
+                        <a href="https://github.com/down-kingo/downkingo" target="_blank" class="text-muted hover:text-primary transition-colors">GitHub</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Simple Copyright -->
+            <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <p class="font-mono text-[10px] text-muted uppercase tracking-widest">© 2026 DownKingo. MIT License.</p>
+                <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/50"></span>
+                    <p class="font-mono text-[10px] text-muted uppercase tracking-widest">
+                        Designed by <a href="https://links.epixel.com.br" target="_blank" class="text-white hover:text-primary hover:underline underline-offset-4 transition-all">Emanuel Nunes</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script is:inline>
+        // Smooth Mouse Follower
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            const spotlight = document.getElementById('spotlight');
+            if(spotlight) {
+                spotlight.style.setProperty('--x', `${x}px`);
+                spotlight.style.setProperty('--y', `${y}px`);
+            }
+        });
+
+        // Intersection Observer for Reveal
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-wrapper').forEach(el => observer.observe(el));
+
+        // OS Detection Logic
+        (function() {
+            const btnText = document.getElementById('hero-download-text');
+            const userAgent = window.navigator.userAgent;
+            const platform = window.navigator.platform;
+            
+            let osName = null;
+
+            if (platform.indexOf('Win') !== -1) {
+                osName = 'Windows';
+            } else if (platform.indexOf('Mac') !== -1) {
+                osName = 'macOS';
+            } else if (platform.indexOf('Linux') !== -1) {
+                // Try to detect distro if possible, usually hard via JS but we can check UA string
+                if (userAgent.indexOf('Ubuntu') !== -1) osName = 'Linux (Ubuntu)';
+                else osName = 'Linux';
+            } else if (/Android/.test(userAgent)) {
+                osName = 'Android';
+            } else if (/iPhone|iPad|iPod/.test(userAgent)) {
+                osName = 'iOS';
+            }
+
+            if (osName && btnText) {
+                btnText.textContent = `Download for ${osName}`;
+            }
+        })();
+    </script>
+</body>
+</html>

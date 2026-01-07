@@ -10,10 +10,10 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 /* ===== STARLIGHT THEME CUSTOMIZATION ===== */
 :root {
-  /* Accent color: Ferrari Red */
-  --sl-color-accent-low: #3d1010;
-  --sl-color-accent: #ff1f1f;
-  --sl-color-accent-high: #ff7070;
+  /* Accent color: Kingo Brand */
+  --sl-color-accent-low: #3d1005;
+  --sl-color-accent: #f24e1e;
+  --sl-color-accent-high: #ff8a65;
 }
 
 /* ===== THEME CONFIG (Tailwind v4 CSS-first) ===== */
@@ -28,7 +28,7 @@
   --color-surface: #111111;
   --color-border-dim: #222222;
   --color-border-mid: #333333;
-  --color-primary: #ff1f1f;
+  --color-primary: #f24e1e;
   --color-accent: #380505;
   --color-muted: #666666;
 
@@ -172,6 +172,14 @@
   .mask-fade {
     mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+  }
+
+  /* Kingo Brand Gradient */
+  .text-gradient-kingo {
+    background: linear-gradient(to right, #f24e1e, #ffc700, #0acf83, #1abcfe);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }
 

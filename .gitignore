@@ -30,3 +30,11 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Cloudflare Pages / Wrangler
+.wrangler/
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini

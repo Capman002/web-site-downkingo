@@ -1,0 +1,207 @@
+---
+import '../../styles/global.css';
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import { SEO } from 'astro-seo';
+import wailsIcon from '../../assets/wails-icon.ico';
+
+// Metadata for SEO
+const title = "Baixar DownKingo - A Toolbox de Mídia Universal";
+const description = "Baixe o DownKingo para Windows, macOS e Linux. O baixador de mídia focado em privacidade, ultra rápido e open source.";
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth selection:bg-primary/30 selection:text-white">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <SEO
+      title={title}
+      description={description}
+      canonical="https://downkingo.com/pt/download"
+      openGraph={{
+        basic: {
+          title: title,
+          type: "website",
+          image: "https://downkingo.com/og-image.png",
+          url: "https://downkingo.com/pt/download"
+        }
+      }}
+      charset="UTF-8"
+      extend={{
+        meta: [
+          { name: "theme-color", content: "#050505" }
+        ],
+        link: [
+          { rel: "icon", type: "image/x-icon", href: "/icon.ico?v=3" }
+        ]
+      }}
+    />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script type="text/partytown" defer data-domain="downkingo.com" src="https://plausible.io/js/script.js"></script>
+</head>
+<body class="bg-page text-swiss antialiased overflow-x-hidden relative min-h-screen flex flex-col">
+
+    <!-- Noise Texture -->
+    <div class="fixed inset-0 pointer-events-none z-[60] opacity-[0.03] mix-blend-overlay" style="background-image: url('https://grainy-gradients.vercel.app/noise.svg');"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm md:max-w-2xl px-4">
+        <div class="glass rounded-full px-6 py-3 flex items-center justify-between border border-white/5 bg-black/50 backdrop-blur-xl">
+            <a href="/pt/" class="font-black text-lg tracking-tighter uppercase flex items-center gap-2 group">
+                 <Image src={wailsIcon} alt="DownKingo Logo" width={20} height={20} class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                DownKingo
+            </a>
+            
+            <div class="hidden md:flex gap-8 font-mono text-xs font-medium text-muted">
+                <a href="/pt/" class="hover:text-white transition-colors">INÍCIO</a>
+                <a href="/pt/download" class="text-white">BAIXAR</a>
+                <a href="/pt/#build-in-public" class="hover:text-white transition-colors">ROADMAP</a>
+                <a href="https://github.com/down-kingo/downkingo" target="_blank" class="flex items-center gap-1 hover:text-white transition-colors">
+                    GITHUB <Icon name="lucide:external-link" width={12} />
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow relative z-10 w-full pt-32 pb-20 px-6">
+        
+        <!-- Header -->
+        <div class="max-w-4xl mx-auto text-center space-y-6 mb-20">
+            <h1 class="font-black text-5xl md:text-7xl tracking-tight uppercase text-white drop-shadow-2xl">
+                Obter o <br><span class="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">DownKingo.</span>
+            </h1>
+            <p class="text-muted text-lg max-w-xl mx-auto leading-relaxed">
+                Escolha sua plataforma. Grátis, Open Source e SEM RASTREAMENTO.
+                <br>Versão Mais Recente: <span class="font-mono text-primary">v2.0.0</span>
+            </p>
+        </div>
+
+        <!-- Download Cards Grid -->
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8" id="download-grid">
+            
+            <!-- Windows (Default Highlighted) -->
+            <div id="card-windows" class="group relative bg-[#09090b] border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/50">
+                <div class="absolute inset-x-0 h-px top-0 bg-gradient-to-r from-transparent via-blue-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                <div class="h-12 w-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-colors">
+                    <Icon name="simple-icons:windows" class="text-blue-400" width={24} />
+                </div>
+                
+                <h3 class="text-2xl font-bold text-white mb-2">Windows</h3>
+                <p class="text-sm text-muted font-mono mb-6">Windows 10/11 (64-bit)</p>
+                
+                <a href="https://github.com/down-kingo/downkingo/releases/download/v2.0.0/DownKingo.exe" class="block w-full py-4 rounded-lg bg-white text-black font-black text-center uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
+                    Baixar .exe
+                </a>
+                <div class="mt-4 flex justify-center gap-4 text-[10px] text-muted font-mono">
+                    <span class="text-emerald-500 flex items-center gap-1"><Icon name="lucide:check-circle" width={10} /> Verificado</span>
+                </div>
+            </div>
+
+            <!-- Linux -->
+            <div id="card-linux" class="group relative bg-[#09090b] border border-white/10 rounded-2xl p-8 hover:border-cyan-500/30 transition-all duration-300 hover:-translate-y-1 opacity-80 hover:opacity-100">
+                 <div class="absolute inset-x-0 h-px top-0 bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                <div class="h-12 w-12 bg-orange-500/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-orange-500/20 transition-colors">
+                    <Icon name="simple-icons:linux" class="text-orange-400" width={24} />
+                </div>
+                
+                <h3 class="text-2xl font-bold text-white mb-2">Linux <span class="text-xs font-mono text-cyan-500 border border-cyan-500/20 bg-cyan-500/5 px-2 py-1 rounded ml-2 align-middle">BETA</span></h3>
+                <p class="text-sm text-muted font-mono mb-6">AppImage (Universal)</p>
+                
+                <a href="https://github.com/down-kingo/downkingo/releases/download/v2.0.0/DownKingo.AppImage" class="block w-full py-4 rounded-lg bg-white/5 border border-white/10 text-white font-black text-center uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-all">
+                    Baixar AppImage
+                </a>
+                <div class="mt-4 flex justify-center gap-4 text-[10px] text-muted font-mono">
+                    <span>v2.0.0</span>
+                </div>
+            </div>
+
+            <!-- macOS -->
+            <div id="card-mac" class="group relative bg-[#09090b] border border-white/10 rounded-2xl p-8 hover:border-yellow-500/30 transition-all duration-300 hover:-translate-y-1 opacity-80 hover:opacity-100">
+                 <div class="absolute inset-x-0 h-px top-0 bg-gradient-to-r from-transparent via-yellow-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                <div class="h-12 w-12 bg-white/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-white/20 transition-colors">
+                    <Icon name="simple-icons:apple" class="text-white" width={24} />
+                </div>
+                
+                <h3 class="text-2xl font-bold text-white mb-2">macOS <span class="text-xs font-mono text-yellow-500 border border-yellow-500/20 bg-yellow-500/5 px-2 py-1 rounded ml-2 align-middle">LEGADO</span></h3>
+                <p class="text-xs text-muted font-mono mb-6 leading-relaxed">
+                    v1.1.0 "Kingo Classic"<br>
+                    <span class="text-white/40 italic">v2.0 ainda não disponível para Mac</span>
+                </p>
+                
+                <a href="https://github.com/down-kingo/downkingo/releases/download/v1.1.0/Kinematic.dmg" class="block w-full py-4 rounded-lg bg-white/5 border border-white/10 text-white font-black text-center uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-all">
+                    Baixar v1.1.0
+                </a>
+                <div class="mt-4 flex justify-center gap-4 text-[10px] text-muted font-mono">
+                    <span class="hover:text-white cursor-pointer" title="Suporta Macs Intel">Intel</span>
+                    <span>•</span>
+                    <span class="hover:text-white cursor-pointer" title="Requer Rosetta 2">Apple Silicon</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-white/5 bg-black mt-auto">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-end justify-between gap-6">
+                <div>
+                <span class="font-black text-2xl text-white tracking-tighter uppercase block">DownKingo<span class="text-primary">.</span></span>
+                <span class="font-mono text-[10px] text-muted uppercase mt-2 block">Feat. Wails v2 + React</span>
+                </div>
+                
+                <div class="flex flex-col md:items-end gap-2">
+                    <p class="font-mono text-[10px] text-muted uppercase">© 2026 - MIT Open Source License</p>
+                    <div class="flex gap-4 mt-2">
+                    <a href="https://github.com/down-kingo/downkingo" target="_blank" aria-label="GitHub" class="text-muted hover:text-white transition-colors"><Icon name="simple-icons:github" /></a>
+                    <a href="https://twitter.com/downkingo" target="_blank" aria-label="Twitter" class="text-muted hover:text-white transition-colors"><Icon name="simple-icons:x" /></a>
+                    </div>
+                </div>
+            </div>
+    </footer>
+
+    <!-- OS Detection Script -->
+    <script is:inline>
+        document.addEventListener('DOMContentLoaded', () => {
+             const userAgent = window.navigator.userAgent;
+             const platform = window.navigator.platform;
+             
+             const winCard = document.getElementById('card-windows');
+             const macCard = document.getElementById('card-mac');
+             const linCard = document.getElementById('card-linux');
+
+             // Reset all to base state
+             const resetCards = () => {
+                 [winCard, macCard, linCard].forEach(card => {
+                     card.classList.add('opacity-80');
+                     card.classList.remove('scale-105', 'border-primary', 'shadow-2xl', 'opacity-100');
+                     const btn = card.querySelector('a');
+                     if(btn.id !== 'primary-btn-win') { // Keep structure simple
+                        // Reset buttons if we had complex logic, but CSS handles hover mostly
+                     }
+                 });
+             };
+
+             // Highlight Logic
+             if (platform.indexOf('Win') !== -1) {
+                 winCard.classList.remove('opacity-80');
+                 winCard.classList.add('scale-105', 'border-blue-500', 'shadow-[0_0_30px_rgba(59,130,246,0.2)]', 'z-10', 'opacity-100');
+             } else if (platform.indexOf('Mac') !== -1) {
+                 macCard.classList.remove('opacity-80');
+                 macCard.classList.add('scale-105', 'border-yellow-500', 'shadow-[0_0_30px_rgba(234,179,8,0.2)]', 'z-10', 'opacity-100');
+             } else if (platform.indexOf('Linux') !== -1) {
+                 linCard.classList.remove('opacity-80');
+                 linCard.classList.add('scale-105', 'border-cyan-500', 'shadow-[0_0_30px_rgba(6,182,212,0.2)]', 'z-10', 'opacity-100');
+             }
+        });
+    </script>
+</body>
+</html>

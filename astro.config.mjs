@@ -1,12 +1,31 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import tailwindcss from "@tailwindcss/vite";
+import icon from "astro-icon";
+
+import sitemap from "@astrojs/sitemap";
+
+import partytown from "@astrojs/partytown";
+
+import robotsTxt from "astro-robots-txt";
+import compress from "@playform/compress";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://downkingo.com",
+  prefetch: true,
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en", "pt"],
+    routing: {
+      prefixDefaultLocale: false,
+      redirectToDefaultLocale: true,
+    },
+  },
   integrations: [
+    icon(),
     starlight({
-      title: "DownKingo",
+      title: "DownKingo Docs",
       favicon: "/icon.ico",
       social: [
         {
@@ -35,6 +54,22 @@ export default defineConfig({
         },
       ],
     }),
+    sitemap({
+      i18n: {
+        defaultLocale: "en",
+        locales: {
+          en: "en",
+          pt: "pt-BR",
+        },
+      },
+    }),
+    partytown({
+      config: {
+        forward: ["plausible"],
+      },
+    }),
+    robotsTxt(),
+    compress(),
   ],
   vite: {
     plugins: [tailwindcss()],
