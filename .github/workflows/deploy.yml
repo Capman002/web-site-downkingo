@@ -18,9 +18,7 @@ jobs:
           bun-version: latest
 
       - name: Install Dependencies
-        run: |
-          rm -f bun.lockb package-lock.json
-          bun install
+        run: bun install
 
       - name: Build
         run: bun run build
