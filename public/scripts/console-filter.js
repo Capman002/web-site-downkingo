@@ -1,35 +1,71 @@
 /**
- * Console Filter - DownKingo
- * Filtra logs do console para mostrar apenas mensagens do próprio site,
- * removendo ruído de extensões do navegador e scripts de terceiros.
+ * DownKingo Console Filter v2.0
+ *
+ * Suprime logs do console de extensões de navegador e scripts de terceiros.
+ * Utiliza uma abordagem de whitelist: apenas mensagens que passam pela API
+ * do próprio site serão exibidas.
+ *
+ * @author DownKingo Team
  */
 (function () {
   "use strict";
 
-  // Domínios permitidos (mensagens desses domínios serão exibidas)
-  const ALLOWED_DOMAINS = ["downkingo.com", "localhost", "127.0.0.1"];
+  // ===========================================
+  // CONFIGURATION
+  // ===========================================
 
-  // Padrões de URL a serem bloqueados (extensões, analytics, etc.)
-  const BLOCKED_PATTERNS = [
-    /^chrome-extension:\/\//,
-    /^moz-extension:\/\//,
-    /^safari-extension:\/\//,
-    /^ms-browser-extension:\/\//,
-    /extensions\//i,
-    /google-analytics\.com/,
-    /googletagmanager\.com/,
-    /facebook\.net/,
-    /doubleclick\.net/,
-    /hotjar\.com/,
-    /clarity\.ms/,
+  // Prefixo para logs explícitos do DownKingo (opcional)
+  var APP_PREFIX = "[DownKingo]";
+
+  // Padrões de mensagens que devem ser BLOQUEADOS (regex ou string)
+  var BLOCKED_PATTERNS = [
+    // Extensões de navegador
+    /chrome-extension:\/\//i,
+    /moz-extension:\/\//i,
+    /safari-extension:\/\//i,
+    /^EXT\s*-/i,
+    /storeHasCashback/i,
+
+    // Cloudflare / Analytics noise
+    /XHR finished loading/i,
+    /XHR failed loading/i,
+    /Fetch failed loading/i,
+    /sendObjectBeacon/i,
+    /cdn-cgi\/rum/i,
+
+    // Permissions-Policy (não são erros reais, são warnings do browser)
+    /Permissions-Policy/i,
+    /browsing-topics/i,
+    /interest-cohort/i,
+
+    // Preload warnings (informativos, não erros)
+    /was preloaded using link preload but not used/i,
+
+    // Script-src fallback (informativo)
+    /script-src.*was not explicitly set/i,
+    /default-src.*is used as a fallback/i,
+
+    // Message channel (erro de extensão)
+    /listener indicated an asynchronous response/i,
+    /message channel closed/i,
+
+    // Turnstile internal (normal operation, não precisa logar)
+    /Private Access Token challenge/i,
+
+    // Generic extension patterns
+    /app\.js:\d+/i,
+    /\.sendObjectBeacon/i,
   ];
 
-  // Prefixo para identificar logs do site (opcional)
-  const APP_PREFIX = "[DownKingo]";
-  const SHOW_PREFIX = false; // Mude para true se quiser prefixo nos logs
+  // Padrões de mensagens que devem ser SEMPRE PERMITIDOS
+  var ALLOWED_PATTERNS = [/^\[DownKingo\]/i, /downkingo/i];
 
-  // Guarda os métodos originais
-  const originalConsole = {
+  // ===========================================
+  // CORE LOGIC
+  // ===========================================
+
+  // Guarda os métodos originais do console
+  var originalConsole = {
     log: console.log.bind(console),
     info: console.info.bind(console),
     warn: console.warn.bind(console),
@@ -38,71 +74,104 @@
   };
 
   /**
-   * Verifica se o log vem de uma fonte permitida
-   * @returns {boolean}
+   * Converte argumentos para uma string para análise
    */
-  function isFromAllowedSource() {
+  function argsToString(args) {
     try {
-      // Cria um erro para capturar o stack trace
-      const stack = new Error().stack || "";
-
-      // Se o stack contém padrões bloqueados, rejeita
-      for (const pattern of BLOCKED_PATTERNS) {
-        if (pattern.test(stack)) {
-          return false;
-        }
-      }
-
-      // Se o stack contém domínios permitidos, aceita
-      for (const domain of ALLOWED_DOMAINS) {
-        if (stack.includes(domain)) {
-          return true;
-        }
-      }
-
-      // Verifica se é um script inline ou do próprio documento
-      // Scripts inline geralmente têm '<anonymous>' ou o hostname da página
-      const currentHost = window.location.hostname;
-      if (stack.includes(currentHost) || stack.includes("<anonymous>")) {
-        return true;
-      }
-
-      // Se não conseguiu determinar, bloqueia por padrão
-      // (isso pode ser ajustado para 'true' se preferir permitir por padrão)
-      return false;
+      return Array.prototype.map
+        .call(args, function (arg) {
+          if (typeof arg === "string") return arg;
+          if (arg instanceof Error)
+            return arg.message + " " + (arg.stack || "");
+          try {
+            return JSON.stringify(arg);
+          } catch (e) {
+            return String(arg);
+          }
+        })
+        .join(" ");
     } catch (e) {
-      // Em caso de erro, permite o log para não quebrar nada
-      return true;
+      return "";
     }
   }
 
   /**
-   * Sobrescreve um método do console com filtragem
-   * @param {string} method - Nome do método (log, warn, error, etc.)
+   * Verifica se a mensagem combina com algum padrão
    */
-  function overrideConsoleMethod(method) {
-    console[method] = function (...args) {
-      if (isFromAllowedSource()) {
-        if (SHOW_PREFIX) {
-          originalConsole[method](APP_PREFIX, ...args);
-        } else {
-          originalConsole[method](...args);
-        }
+  function matchesPatterns(message, patterns) {
+    for (var i = 0; i < patterns.length; i++) {
+      var pattern = patterns[i];
+      if (pattern instanceof RegExp) {
+        if (pattern.test(message)) return true;
+      } else if (typeof pattern === "string") {
+        if (message.indexOf(pattern) !== -1) return true;
       }
-      // Se não for de fonte permitida, simplesmente ignora
+    }
+    return false;
+  }
+
+  /**
+   * Verifica se a mensagem deve ser exibida
+   */
+  function shouldShowMessage(args) {
+    var message = argsToString(args);
+
+    // Se está na whitelist, sempre mostra
+    if (matchesPatterns(message, ALLOWED_PATTERNS)) {
+      return true;
+    }
+
+    // Se está na blacklist, bloqueia
+    if (matchesPatterns(message, BLOCKED_PATTERNS)) {
+      return false;
+    }
+
+    // Por padrão, mostra (para não perder logs importantes)
+    return true;
+  }
+
+  /**
+   * Cria um wrapper para um método do console
+   */
+  function createWrapper(method) {
+    return function () {
+      if (shouldShowMessage(arguments)) {
+        originalConsole[method].apply(console, arguments);
+      }
     };
   }
 
-  // Aplica a sobrescrita em todos os métodos relevantes
-  ["log", "info", "warn", "error", "debug"].forEach(overrideConsoleMethod);
+  // ===========================================
+  // APPLY OVERRIDES
+  // ===========================================
 
-  // Log inicial para confirmar que o filtro está ativo (pode ser removido em produção)
-  if (
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-  ) {
-    originalConsole.info(
-      "[Console Filter] Filtro de console ativo. Logs de terceiros serão suprimidos."
-    );
+  // Aplica os wrappers
+  console.log = createWrapper("log");
+  console.info = createWrapper("info");
+  console.warn = createWrapper("warn");
+  console.error = createWrapper("error");
+  console.debug = createWrapper("debug");
+
+  // Fornece um método para logs explícitos do app (bypass do filtro)
+  console.app = function () {
+    var args = Array.prototype.slice.call(arguments);
+    args.unshift(APP_PREFIX);
+    originalConsole.log.apply(console, args);
+  };
+
+  // ===========================================
+  // INITIALIZATION LOG (apenas em dev)
+  // ===========================================
+
+  if (typeof window !== "undefined") {
+    var isDev =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    if (isDev) {
+      originalConsole.info(
+        APP_PREFIX,
+        "Console filter active. Third-party logs suppressed."
+      );
+    }
   }
 })();
