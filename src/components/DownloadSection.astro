@@ -231,296 +231,522 @@ const t = translations[lang];
 
 <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
-<script>
-  // Configuration
-  const POLL_INTERVAL = 3000;
-  
-  // State
-  let turnstileToken = null;
-  let pollTimeout = null;
+<script is:inline>
+  /**
+   * DownKingo - Download Section Controller
+   * Professional implementation with robust error handling
+   * @version 2.0.0
+   */
+  (function() {
+    'use strict';
 
-  // DOM Elements
-  const section = document.querySelector('section[data-i18n]');
-  const t = section ? JSON.parse(section.dataset.i18n) : {};
-
-  const urlInput = document.getElementById('videoUrl');
-  const submitBtn = document.getElementById('submitBtn');
-  const btnText = submitBtn.querySelector('.btn-text');
-  const btnLoading = submitBtn.querySelector('.btn-loading');
-  const socialPreview = document.getElementById('socialIconPreview');
-  
-  const statusCard = document.getElementById('statusCard');
-  const videoTitle = document.getElementById('videoTitle');
-  const videoMeta = document.getElementById('videoMeta');
-  const videoThumb = document.getElementById('videoThumb');
-  const thumbPlaceholder = document.getElementById('thumbPlaceholder');
-  const providerBadge = document.getElementById('providerBadge');
-  
-  const statusBadge = document.getElementById('statusBadge');
-  const progressContainer = document.getElementById('progressContainer');
-  const progressFill = document.getElementById('progressFill');
-  const progressPercent = document.getElementById('progressPercent');
-  const progressStatusText = document.getElementById('progressStatusText');
-  
-  const downloadLink = document.getElementById('downloadLink');
-  const errorMessage = document.getElementById('errorMessage');
-  const errorText = document.getElementById('errorText');
-
-  // API Configuration
-  const form = document.querySelector('form[data-api-url]');
-  const apiUrl = form ? form.dataset.apiUrl : 'http://localhost:8080/api';
-  
-  // --- Social Icon Logic ---
-  const socialIcons = {
-    'youtube.com': { name: 'YouTube', color: '#FF0000', icon: '<path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>' },
-    'youtu.be': { name: 'YouTube', color: '#FF0000', icon: '<path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>' },
-    'instagram.com': { name: 'Instagram', color: '#E4405F', icon: '<path fill="currentColor" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>' },
-    'tiktok.com': { name: 'TikTok', color: '#000000', icon: '<path fill="currentColor" d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>' }
-  };
-
-  urlInput.addEventListener('input', (e) => {
-    const url = e.target.value.toLowerCase();
-    let found = null;
-    
-    // Check for social matches
-    for (const [domain, data] of Object.entries(socialIcons)) {
-      if (url.includes(domain)) {
-        found = data;
-        break;
-      }
-    }
-
-    if (found) {
-      socialPreview.innerHTML = `<svg viewBox="0 0 24 24" class="w-6 h-6" style="color: ${found.color}">${found.icon}</svg>`;
-      socialPreview.classList.remove('opacity-0', 'translate-x-2');
-    } else {
-      socialPreview.classList.add('opacity-0', 'translate-x-2');
-    }
-  });
-
-  // --- Turnstile & Form Logic ---
-
-  // Global callback
-  window.onTurnstileSuccess = (token) => {
-    turnstileToken = token;
-  };
-
-  function resetTurnstile() {
-    if (window.turnstile) {
-      window.turnstile.reset();
-    }
-    turnstileToken = null;
-  }
-
-  function setLoading(loading) {
-    if (loading) {
-      btnText.classList.add('hidden');
-      btnLoading.classList.remove('hidden');
-      submitBtn.disabled = true;
-    } else {
-      btnText.classList.remove('hidden');
-      btnLoading.classList.add('hidden');
-      submitBtn.disabled = false;
-    }
-  }
-
-  // Helper: Get Domain
-  function getDomain(url) {
-     try {
-       return new URL(url).hostname.replace('www.', '');
-     } catch (e) {
-       return 'link';
-     }
-  }
-
-  // UI Updates
-  function updateUI(status) {
-    statusCard.classList.remove('hidden');
-    
-    // update metadata if available (assuming API might pass it back in status)
-    if (status.title && status.title !== videoTitle.textContent) {
-      videoTitle.textContent = status.title;
-      // Also update thumbnail if backend gives it, else keep placeholder
-      if (status.thumbnail) {
-          videoThumb.src = status.thumbnail;
-          videoThumb.classList.remove('hidden');
-          thumbPlaceholder.classList.add('hidden');
-      }
-      
-      // Update badge
-      const domain = getDomain(urlInput.value);
-      let provider = socialIcons[domain] || { name: domain, icon: null };
-      
-      // If we matched a known provider
-      for (const [key, data] of Object.entries(socialIcons)) {
-          if (domain.includes(key)) { provider = data; break; }
-      }
-      
-      if(provider.name) {
-         providerBadge.innerHTML = provider.icon ? `<svg viewBox="0 0 24 24" class="w-3 h-3 text-white fill-current">${provider.icon}</svg> ${provider.name}` : provider.name;
-         providerBadge.style.backgroundColor = provider.color ? provider.color + 'aa' : '#000000aa'; 
-         providerBadge.classList.replace('hidden', 'flex'); 
-      }
-      
-      videoMeta.innerHTML = `<span class="w-4 h-4 rounded-full bg-green-500 mr-2"></span> ${t.detected}`;
-    }
-
-    // Progress
-    progressFill.style.width = `${status.progress}%`;
-    progressPercent.textContent = `${status.progress}%`;
-    
-    // Status Text Badge
-    const badges = {
-      pending: { text: t.status_pending, color: "text-yellow-500", bg: "bg-yellow-500/10", border: "border-yellow-500/20" },
-      processing: { text: t.status_processing, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-      done: { text: t.status_done, color: "text-green-500", bg: "bg-green-500/10", border: "border-green-500/20" },
-      error: { text: t.status_error, color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/20" }
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+    const CONFIG = {
+      POLL_INTERVAL_MS: 3000,
+      POLL_BACKOFF_MS: 5000,
+      ANIMATION_DURATION_MS: 400,
+      MOBILE_BREAKPOINT: 768
     };
-    
-    const style = badges[status.status] || badges.pending;
-    statusBadge.textContent = style.text;
-    statusBadge.className = `py-2 px-3 rounded-lg text-xs font-bold text-center border ${style.color} ${style.bg} ${style.border}`;
-    progressStatusText.textContent = style.text;
 
-    // Done state
-    if (status.status === 'done' && status.download_url) {
-      downloadLink.href = status.download_url;
-      downloadLink.classList.remove('hidden');
-      progressContainer.classList.add('hidden'); 
-      setLoading(false);
-      resetTurnstile();
-    }
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
+    const state = {
+      turnstileToken: null,
+      pollTimeoutId: null,
+      isLoading: false
+    };
 
-    // Error state
-    if (status.status === 'error') {
-      errorMessage.classList.remove('hidden');
-      errorText.textContent = status.error || t.error_unknown;
-      setLoading(false);
-      resetTurnstile();
-    }
-  }
+    // ============================================
+    // SOCIAL PROVIDERS REGISTRY
+    // ============================================
+    const SOCIAL_PROVIDERS = {
+      'youtube.com': { 
+        name: 'YouTube', 
+        color: '#FF0000', 
+        icon: '<path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>' 
+      },
+      'youtu.be': { 
+        name: 'YouTube', 
+        color: '#FF0000', 
+        icon: '<path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>' 
+      },
+      'instagram.com': { 
+        name: 'Instagram', 
+        color: '#E4405F', 
+        icon: '<path fill="currentColor" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>' 
+      },
+      'tiktok.com': { 
+        name: 'TikTok', 
+        color: '#000000', 
+        icon: '<path fill="currentColor" d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>' 
+      }
+    };
 
-  async function pollStatus(jobId) {
-    try {
-       const res = await fetch(`${apiUrl}/status/${jobId}`);
-       
-       // Handle Rate Limiting (429) gracefully
-       if (res.status === 429) {
-           console.warn("Rate limited, backing off...");
-           pollTimeout = setTimeout(() => pollStatus(jobId), 5000);
-           return;
-       }
-
-       if (!res.ok) {
-           // If job not found yet or other non-fatal error, retry slowly
-           if (res.status === 404) {
-               pollTimeout = setTimeout(() => pollStatus(jobId), 3000);
-               return;
-           }
-           throw new Error(`HTTP Error ${res.status}`);
-       }
-
-       const data = await res.json(); 
-       updateUI(data);
-
-       if (data.status === 'done' || data.status === 'error') {
-         pollTimeout = null;
-       } else {
-         // Recursive poll
-         pollTimeout = setTimeout(() => pollStatus(jobId), POLL_INTERVAL);
-       }
-    } catch (e) {
-      console.error(e);
-      // Retry on network error with backoff
-      pollTimeout = setTimeout(() => pollStatus(jobId), 5000);
-    }
-  }
-
-  // Action
-  submitBtn.addEventListener('click', async () => {
-    // 1. Initial Validation
-    if (!turnstileToken) {
-        const tContainer = document.getElementById('turnstile-container');
-        if(tContainer) {
-            tContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            tContainer.classList.add('scale-105', 'drop-shadow-[0_0_15px_rgba(255,50,50,0.5)]');
-            setTimeout(() => tContainer.classList.remove('scale-105', 'drop-shadow-[0_0_15px_rgba(255,50,50,0.5)]'), 400);
+    // ============================================
+    // DOM ELEMENT CACHE (with null safety)
+    // ============================================
+    const DOM = {
+      // Get element safely with type assertion
+      get: function(id) {
+        return document.getElementById(id);
+      },
+      
+      // Get required element (throws if not found in dev)
+      getRequired: function(id) {
+        const el = document.getElementById(id);
+        if (!el && typeof console !== 'undefined') {
+          console.warn('[DownKingo] Required element not found:', id);
         }
-        // Show immediate error toast or feedback
-        statusCard.classList.remove('hidden');
-        errorMessage.classList.remove('hidden');
-        errorText.textContent = "Por favor, complete a verificação de segurança (Captcha) abaixo.";
+        return el;
+      }
+    };
+
+    // Lazy-loaded DOM cache
+    let elements = null;
+    
+    function getElements() {
+      if (elements) return elements;
+      
+      const section = document.querySelector('section[data-i18n]');
+      const form = document.querySelector('form[data-api-url]');
+      
+      elements = {
+        section: section,
+        translations: section ? JSON.parse(section.dataset.i18n || '{}') : {},
+        apiUrl: form && form.dataset.apiUrl ? form.dataset.apiUrl : 'http://localhost:8080/api',
+        
+        // Input elements
+        urlInput: DOM.get('videoUrl'),
+        submitBtn: DOM.get('submitBtn'),
+        socialPreview: DOM.get('socialIconPreview'),
+        
+        // Status card elements  
+        statusCard: DOM.get('statusCard'),
+        videoTitle: DOM.get('videoTitle'),
+        videoMeta: DOM.get('videoMeta'),
+        videoThumb: DOM.get('videoThumb'),
+        thumbPlaceholder: DOM.get('thumbPlaceholder'),
+        providerBadge: DOM.get('providerBadge'),
+        
+        // Progress elements
+        statusBadge: DOM.get('statusBadge'),
+        progressContainer: DOM.get('progressContainer'),
+        progressFill: DOM.get('progressFill'),
+        progressPercent: DOM.get('progressPercent'),
+        progressStatusText: DOM.get('progressStatusText'),
+        
+        // Action elements
+        downloadLink: DOM.get('downloadLink'),
+        errorMessage: DOM.get('errorMessage'),
+        errorText: DOM.get('errorText'),
+        turnstileContainer: DOM.get('turnstile-container')
+      };
+      
+      // Cache button children
+      if (elements.submitBtn) {
+        elements.btnText = elements.submitBtn.querySelector('.btn-text');
+        elements.btnLoading = elements.submitBtn.querySelector('.btn-loading');
+      }
+      
+      return elements;
+    }
+
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+    
+    /**
+     * Safely extracts domain from URL
+     */
+    function extractDomain(url) {
+      try {
+        return new URL(url).hostname.replace('www.', '');
+      } catch {
+        return 'link';
+      }
+    }
+
+    /**
+     * Finds matching social provider for a URL
+     */
+    function findSocialProvider(url) {
+      const lowerUrl = url.toLowerCase();
+      for (const [domain, data] of Object.entries(SOCIAL_PROVIDERS)) {
+        if (lowerUrl.includes(domain)) {
+          return data;
+        }
+      }
+      return null;
+    }
+
+    /**
+     * Creates SVG icon HTML
+     */
+    function createSvgIcon(iconPath, className, style) {
+      return '<svg viewBox="0 0 24 24" class="' + (className || '') + '"' + 
+             (style ? ' style="' + style + '"' : '') + '>' + iconPath + '</svg>';
+    }
+
+    /**
+     * Adds temporary CSS classes with auto-removal
+     */
+    function flashClasses(element, classes, durationMs) {
+      if (!element) return;
+      const classList = Array.isArray(classes) ? classes : [classes];
+      classList.forEach(function(c) { element.classList.add(c); });
+      setTimeout(function() {
+        classList.forEach(function(c) { element.classList.remove(c); });
+      }, durationMs || CONFIG.ANIMATION_DURATION_MS);
+    }
+
+    // ============================================
+    // TURNSTILE INTEGRATION
+    // ============================================
+    
+    // Global callback for Turnstile
+    window.onTurnstileSuccess = function(token) {
+      state.turnstileToken = token;
+    };
+
+    function resetTurnstile() {
+      if (window.turnstile && typeof window.turnstile.reset === 'function') {
+        window.turnstile.reset();
+      }
+      state.turnstileToken = null;
+    }
+
+    // ============================================
+    // UI STATE MANAGEMENT
+    // ============================================
+
+    function setLoadingState(isLoading) {
+      const els = getElements();
+      state.isLoading = isLoading;
+      
+      if (!els.submitBtn) return;
+      
+      if (isLoading) {
+        if (els.btnText) els.btnText.classList.add('hidden');
+        if (els.btnLoading) els.btnLoading.classList.remove('hidden');
+        els.submitBtn.disabled = true;
+      } else {
+        if (els.btnText) els.btnText.classList.remove('hidden');
+        if (els.btnLoading) els.btnLoading.classList.add('hidden');
+        els.submitBtn.disabled = false;
+      }
+    }
+
+    function showError(message) {
+      const els = getElements();
+      if (els.statusCard) els.statusCard.classList.remove('hidden');
+      if (els.errorMessage) els.errorMessage.classList.remove('hidden');
+      if (els.errorText) els.errorText.textContent = message;
+    }
+
+    function hideError() {
+      const els = getElements();
+      if (els.errorMessage) els.errorMessage.classList.add('hidden');
+    }
+
+    function updateProgress(percent, statusText) {
+      const els = getElements();
+      if (els.progressFill) els.progressFill.style.width = percent + '%';
+      if (els.progressPercent) els.progressPercent.textContent = percent + '%';
+      if (statusText && els.progressStatusText) els.progressStatusText.textContent = statusText;
+    }
+
+    // ============================================
+    // STATUS UPDATE LOGIC
+    // ============================================
+
+    function updateUIWithStatus(status) {
+      const els = getElements();
+      const t = els.translations;
+      
+      if (els.statusCard) els.statusCard.classList.remove('hidden');
+      
+      // Update metadata if available
+      if (status.title && els.videoTitle && status.title !== els.videoTitle.textContent) {
+        els.videoTitle.textContent = status.title;
+        
+        // Update thumbnail if provided
+        if (status.thumbnail && els.videoThumb) {
+          els.videoThumb.src = status.thumbnail;
+          els.videoThumb.classList.remove('hidden');
+          if (els.thumbPlaceholder) els.thumbPlaceholder.classList.add('hidden');
+        }
+        
+        // Update provider badge
+        updateProviderBadge();
+        
+        // Update meta text
+        if (els.videoMeta) {
+          els.videoMeta.innerHTML = '<span class="w-4 h-4 rounded-full bg-green-500 mr-2"></span> ' + (t.detected || 'Detected');
+        }
+      }
+
+      // Update progress
+      updateProgress(status.progress || 0);
+      
+      // Status badge styling
+      var badges = {
+        pending: { text: t.status_pending || 'Queued', color: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20' },
+        processing: { text: t.status_processing || 'Downloading...', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+        done: { text: t.status_done || 'Ready', color: 'text-green-500', bg: 'bg-green-500/10', border: 'border-green-500/20' },
+        error: { text: t.status_error || 'Error', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' }
+      };
+      
+      var style = badges[status.status] || badges.pending;
+      
+      if (els.statusBadge) {
+        els.statusBadge.textContent = style.text;
+        els.statusBadge.className = 'py-2 px-3 rounded-lg text-xs font-bold text-center border ' + 
+                                    style.color + ' ' + style.bg + ' ' + style.border;
+      }
+      if (els.progressStatusText) els.progressStatusText.textContent = style.text;
+
+      // Handle completion
+      if (status.status === 'done' && status.download_url) {
+        if (els.downloadLink) {
+          els.downloadLink.href = status.download_url;
+          els.downloadLink.classList.remove('hidden');
+        }
+        if (els.progressContainer) els.progressContainer.classList.add('hidden');
+        setLoadingState(false);
+        resetTurnstile();
+      }
+
+      // Handle error
+      if (status.status === 'error') {
+        showError(status.error || t.error_unknown || 'Unknown error');
+        setLoadingState(false);
+        resetTurnstile();
+      }
+    }
+
+    function updateProviderBadge() {
+      const els = getElements();
+      if (!els.urlInput || !els.providerBadge) return;
+      
+      var domain = extractDomain(els.urlInput.value || '');
+      var provider = null;
+      
+      // Find matching provider
+      for (var key in SOCIAL_PROVIDERS) {
+        if (domain.includes(key)) {
+          provider = SOCIAL_PROVIDERS[key];
+          break;
+        }
+      }
+      
+      if (!provider) {
+        provider = { name: domain, icon: null, color: null };
+      }
+      
+      if (provider.name) {
+        var badgeContent = provider.icon 
+          ? createSvgIcon(provider.icon, 'w-3 h-3 text-white fill-current') + ' ' + provider.name 
+          : provider.name;
+        els.providerBadge.innerHTML = badgeContent;
+        els.providerBadge.style.backgroundColor = provider.color ? provider.color + 'aa' : '#000000aa';
+        els.providerBadge.classList.remove('hidden');
+        els.providerBadge.classList.add('flex');
+      }
+    }
+
+    // ============================================
+    // API POLLING
+    // ============================================
+
+    function pollJobStatus(jobId) {
+      const els = getElements();
+      const apiUrl = els.apiUrl;
+      
+      fetch(apiUrl + '/status/' + jobId)
+        .then(function(res) {
+          // Handle rate limiting
+          if (res.status === 429) {
+            console.warn('[DownKingo] Rate limited, backing off...');
+            state.pollTimeoutId = setTimeout(function() { pollJobStatus(jobId); }, CONFIG.POLL_BACKOFF_MS);
+            return null;
+          }
+          
+          // Handle not found (job still queuing)
+          if (res.status === 404) {
+            state.pollTimeoutId = setTimeout(function() { pollJobStatus(jobId); }, CONFIG.POLL_INTERVAL_MS);
+            return null;
+          }
+          
+          if (!res.ok) {
+            throw new Error('HTTP Error ' + res.status);
+          }
+          
+          return res.json();
+        })
+        .then(function(data) {
+          if (!data) return; // Early exit for rate limit / 404
+          
+          updateUIWithStatus(data);
+          
+          if (data.status === 'done' || data.status === 'error') {
+            state.pollTimeoutId = null;
+          } else {
+            state.pollTimeoutId = setTimeout(function() { pollJobStatus(jobId); }, CONFIG.POLL_INTERVAL_MS);
+          }
+        })
+        .catch(function(err) {
+          console.error('[DownKingo] Poll error:', err);
+          // Retry with backoff on network errors
+          state.pollTimeoutId = setTimeout(function() { pollJobStatus(jobId); }, CONFIG.POLL_BACKOFF_MS);
+        });
+    }
+
+    // ============================================
+    // FORM SUBMISSION
+    // ============================================
+
+    function handleSubmit() {
+      const els = getElements();
+      const t = els.translations;
+      
+      // Validation: Turnstile token
+      if (!state.turnstileToken) {
+        if (els.turnstileContainer) {
+          els.turnstileContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          flashClasses(els.turnstileContainer, ['scale-105', 'drop-shadow-[0_0_15px_rgba(255,50,50,0.5)]']);
+        }
+        showError('Por favor, complete a verificação de segurança (Captcha) abaixo.');
         return;
-    }
-    
-    const url = urlInput.value.trim();
-    if (!url) {
-        urlInput.focus();
-        urlInput.parentElement.classList.add('ring-2', 'ring-red-500/50', 'bg-red-500/10');
-        setTimeout(() => urlInput.parentElement.classList.remove('ring-2', 'ring-red-500/50', 'bg-red-500/10'), 500);
+      }
+      
+      // Validation: URL
+      var url = els.urlInput ? els.urlInput.value.trim() : '';
+      if (!url) {
+        if (els.urlInput) {
+          els.urlInput.focus();
+          var parent = els.urlInput.parentElement;
+          if (parent) {
+            flashClasses(parent, ['ring-2', 'ring-red-500/50', 'bg-red-500/10'], 500);
+          }
+        }
         return;
-    }
+      }
 
-    // 2. Prepare UI for Loading
-    if (pollTimeout) clearTimeout(pollTimeout);
-    downloadLink.classList.add('hidden');
-    errorMessage.classList.add('hidden');
-    progressContainer.classList.remove('hidden');
-    
-    // Reset Progress Visuals to "Starting" state
-    progressFill.style.width = '0%';
-    progressFill.classList.add('animate-pulse'); // Pulse to show activity
-    progressStatusText.textContent = t.starting;
-    progressPercent.textContent = "0%";
-    
-    videoTitle.textContent = t.searching;
-    videoMeta.innerHTML = `<span class="w-4 h-4 rounded-full bg-white/10 animate-pulse mr-2"></span> ${t.waiting_metadata}`;
-    
-    // Show the status card immediately so user sees "something is happening"
-    statusCard.classList.remove('hidden'); 
-    
-    // Scroll to status card on mobile
-    if(window.innerWidth < 768) {
-        statusCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+      // Clear previous polling
+      if (state.pollTimeoutId) {
+        clearTimeout(state.pollTimeoutId);
+        state.pollTimeoutId = null;
+      }
 
-    setLoading(true);
+      // Reset UI for new request
+      hideError();
+      if (els.downloadLink) els.downloadLink.classList.add('hidden');
+      if (els.progressContainer) els.progressContainer.classList.remove('hidden');
+      
+      updateProgress(0, t.starting || 'Starting...');
+      if (els.progressFill) els.progressFill.classList.add('animate-pulse');
+      
+      if (els.videoTitle) els.videoTitle.textContent = t.searching || 'Searching...';
+      if (els.videoMeta) {
+        els.videoMeta.innerHTML = '<span class="w-4 h-4 rounded-full bg-white/10 animate-pulse mr-2"></span> ' + 
+                                  (t.waiting_metadata || 'Waiting metadata...');
+      }
+      
+      if (els.statusCard) els.statusCard.classList.remove('hidden');
+      
+      // Mobile: scroll to status
+      if (window.innerWidth < CONFIG.MOBILE_BREAKPOINT && els.statusCard) {
+        els.statusCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
 
-    // 3. API Call
-    try {
-      const res = await fetch(`${apiUrl}/download`, {
+      setLoadingState(true);
+
+      // API Request
+      fetch(els.apiUrl + '/download', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Turnstile-Token': turnstileToken
+          'X-Turnstile-Token': state.turnstileToken
         },
-        body: JSON.stringify({ url })
+        body: JSON.stringify({ url: url })
+      })
+      .then(function(res) {
+        return res.json().then(function(data) {
+          if (!res.ok) {
+            throw new Error(data.error || t.error_failed_start || 'Failed to start');
+          }
+          return data;
+        });
+      })
+      .then(function(data) {
+        // Show initial progress
+        updateProgress(10, t.waiting || 'Waiting...');
+        if (els.progressFill) els.progressFill.classList.remove('animate-pulse');
+        
+        // Start polling
+        pollJobStatus(data.job_id);
+      })
+      .catch(function(err) {
+        console.error('[DownKingo] Submit error:', err);
+        showError(err.message || t.error_occurred || 'An error occurred');
+        if (els.errorMessage) flashClasses(els.errorMessage, 'animate-shake');
+        if (els.progressContainer) els.progressContainer.classList.add('hidden');
+        setLoadingState(false);
+        resetTurnstile();
       });
-
-      const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.error || t.error_failed_start);
-      
-      // Request started successfully
-      progressFill.style.width = '10%'; // Jump to 10% to show connection made
-      progressPercent.textContent = "10%";
-      progressStatusText.textContent = t.waiting; // "Aguardando fila..."
-
-      // Start Polling
-      pollStatus(data.job_id);
-
-    } catch (e) {
-      console.error("Download Error:", e);
-      errorMessage.classList.remove('hidden');
-      errorMessage.classList.add('animate-shake'); // Add shake animation
-      errorText.textContent = e.message || t.error_occurred;
-      
-      // Hide progress bar on error since it failed
-      progressContainer.classList.add('hidden');
-      
-      setLoading(false);
-      resetTurnstile();
     }
-  });
 
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+
+    function initEventListeners() {
+      const els = getElements();
+      
+      // URL input: social icon preview
+      if (els.urlInput) {
+        els.urlInput.addEventListener('input', function(e) {
+          var input = e.target;
+          if (!input) return;
+          
+          var url = input.value || '';
+          var provider = findSocialProvider(url);
+          
+          if (provider && els.socialPreview) {
+            els.socialPreview.innerHTML = createSvgIcon(provider.icon, 'w-6 h-6', 'color: ' + provider.color);
+            els.socialPreview.classList.remove('opacity-0', 'translate-x-2');
+          } else if (els.socialPreview) {
+            els.socialPreview.classList.add('opacity-0', 'translate-x-2');
+          }
+        });
+      }
+      
+      // Submit button
+      if (els.submitBtn) {
+        els.submitBtn.addEventListener('click', handleSubmit);
+      }
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+
+    function init() {
+      // Wait for DOM to be ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          initEventListeners();
+        });
+      } else {
+        initEventListeners();
+      }
+    }
+
+    // Start the application
+    init();
+
+  })();
 </script>
