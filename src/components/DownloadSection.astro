@@ -447,6 +447,7 @@ const t = translations[lang];
             setTimeout(() => tContainer.classList.remove('scale-105', 'drop-shadow-[0_0_15px_rgba(255,50,50,0.5)]'), 400);
         }
         // Show immediate error toast or feedback
+        statusCard.classList.remove('hidden');
         errorMessage.classList.remove('hidden');
         errorText.textContent = "Por favor, complete a verificação de segurança (Captcha) abaixo.";
         return;
