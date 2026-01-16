@@ -468,28 +468,29 @@ const t = translations[lang];
       
       if (els.statusCard) els.statusCard.classList.remove('hidden');
       
-      // Update metadata if available
-      if (status.title && els.videoTitle && status.title !== els.videoTitle.textContent) {
+      // Always update progress (even without title)
+      var progress = status.progress || 0;
+      updateProgress(progress);
+      
+      // Update title if available
+      if (status.title && els.videoTitle) {
         els.videoTitle.textContent = status.title;
         
-        // Update thumbnail if provided
-        if (status.thumbnail && els.videoThumb) {
-          els.videoThumb.src = status.thumbnail;
-          els.videoThumb.classList.remove('hidden');
-          if (els.thumbPlaceholder) els.thumbPlaceholder.classList.add('hidden');
-        }
-        
-        // Update provider badge
+        // Update provider badge when title is detected
         updateProviderBadge();
         
-        // Update meta text
+        // Update meta text to show "Detected"
         if (els.videoMeta) {
           els.videoMeta.innerHTML = '<span class="w-4 h-4 rounded-full bg-green-500 mr-2"></span> ' + (t.detected || 'Detected');
         }
       }
-
-      // Update progress
-      updateProgress(status.progress || 0);
+      
+      // Update thumbnail if provided (separate from title check)
+      if (status.thumbnail && els.videoThumb) {
+        els.videoThumb.src = status.thumbnail;
+        els.videoThumb.classList.remove('hidden');
+        if (els.thumbPlaceholder) els.thumbPlaceholder.classList.add('hidden');
+      }
       
       // Status badge styling
       var badges = {
@@ -506,7 +507,20 @@ const t = translations[lang];
         els.statusBadge.className = 'py-2 px-3 rounded-lg text-xs font-bold text-center border ' + 
                                     style.color + ' ' + style.bg + ' ' + style.border;
       }
-      if (els.progressStatusText) els.progressStatusText.textContent = style.text;
+      
+      // Update progress status text with percentage when processing
+      if (els.progressStatusText) {
+        if (status.status === 'processing' && progress > 0) {
+          els.progressStatusText.textContent = style.text + ' (' + progress + '%)';
+        } else {
+          els.progressStatusText.textContent = style.text;
+        }
+      }
+      
+      // Remove pulse animation from progress bar once real progress is received
+      if (progress > 0 && els.progressFill) {
+        els.progressFill.classList.remove('animate-pulse');
+      }
 
       // Handle completion
       if (status.status === 'done' && status.download_url) {
@@ -522,6 +536,7 @@ const t = translations[lang];
       // Handle error
       if (status.status === 'error') {
         showError(status.error || t.error_unknown || 'Unknown error');
+        if (els.progressContainer) els.progressContainer.classList.add('hidden');
         setLoadingState(false);
         resetTurnstile();
       }
