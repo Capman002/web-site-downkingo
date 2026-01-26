@@ -16,14 +16,12 @@ const translations = {
     pt: {
         home: 'INÍCIO',
         download: 'BAIXAR APP',
-        online: 'ONLINE',
         roadmap: 'ROADMAP',
         github: 'GITHUB',
     },
     en: {
         home: 'HOME',
         download: 'DOWNLOAD APP',
-        online: 'ONLINE',
         roadmap: 'ROADMAP',
         github: 'GITHUB',
     }
@@ -34,7 +32,6 @@ const t = translations[lang];
 const navLinks = [
     { key: 'home', href: `${basePath}/`, label: t.home },
     { key: 'download', href: `${basePath}/download`, label: t.download },
-    { key: 'online', href: lang === 'pt' ? `${basePath}/baixar-videos-online` : `${basePath}/online-video-downloader`, label: t.online },
     { key: 'roadmap', href: `${basePath}/#build-in-public`, label: t.roadmap },
 ];
 ---
